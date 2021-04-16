@@ -46,6 +46,9 @@ class bmp2nii():
         '''
         making multiple bmp files to one nii.gz file
         '''
+        # # unsorted files --> make distortion on the nii image.
+        # OCT_notsrt = glob.glob(os.path.join(OCT,'*.bmp'))
+
         OCT_sorted = sorted(glob.glob(os.path.join(OCT,'*.bmp')), key=os.path.getmtime) # sorting files in directory
         reader = sitk.ImageSeriesReader()
         reader.SetFileNames(OCT_sorted)
@@ -53,7 +56,9 @@ class bmp2nii():
         self.niiname = f'{dnum}.nii.gz'
         self.niipath = os.path.join(self.niidir, self.niiname)
         sitk.WriteImage(vol, self.niipath)
-        #adding header if there's header file's path
+        
+        
+        # adding header if there's header file's path
         if self.head:
             self.addHeader()
 
@@ -65,4 +70,4 @@ class bmp2nii():
         print(nib_img.header)
         input()
 
-convert = bmp2nii(BMPDIR)(NIIDIR, header=True)
+convert = bmp2nii(BMPDIR)(NIIDIR, header=False)
