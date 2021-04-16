@@ -3,6 +3,7 @@ import glob
 import os, shutil
 import SimpleITK as sitk
 import nibabel   as nib
+import numpy     as np
 
 BMPDIR = '/root/Share/data' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
 NIIDIR = '/root/Share/nii'
@@ -15,6 +16,7 @@ class bmp2nii():
         self.niidir = ''
         self.niiname = ''
         self.niipath = ''
+        self.vol = 0
         
     
     def __call__(self, niidir, header=False):
@@ -52,15 +54,24 @@ class bmp2nii():
         OCT_sorted = sorted(glob.glob(os.path.join(OCT,'*.bmp')), key=os.path.getmtime) # sorting files in directory
         reader = sitk.ImageSeriesReader()
         reader.SetFileNames(OCT_sorted)
-        vol = reader.Execute()
+        self.vol = reader.Execute()
+        self.convertAxis() # do I really need to convert axis? yes. To match with paper
         self.niiname = f'{dnum}.nii.gz'
         self.niipath = os.path.join(self.niidir, self.niiname)
-        sitk.WriteImage(vol, self.niipath)
-        
+        sitk.WriteImage(self.vol, self.niipath)
         
         # adding header if there's header file's path
         if self.head:
             self.addHeader()
+
+    def convertAxis(self):
+        v = sitk.GetArrayFromImage(self.vol) # S/I:400(x), A/P:640(y), R/L:400(z) normal coordinate (matched with real eye position)
+        v = np.swapaxes(v,1,0)               # S/I:640(y), A/P:400(x), R/L: 400(z)
+        v = np.swapaxes(v,1,2)               # S/I:640(y), A/P:400(z), R/L: 400(x)
+        v = np.flipud(v)                     # S/I:640(y), A/P:400(z), R/L: 400(x) --> flip up and down
+        
+        print(f'after convert: S/I:{v.shape[0]}, A/P:{v.shape[1]}, R/L:{v.shape[2]}')
+        self.vol = sitk.GetImageFromArray(v)     
 
     def addHeader(self):
         '''
