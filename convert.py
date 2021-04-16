@@ -18,7 +18,6 @@ class bmp2nii():
         self.niipath = ''
         self.vol = 0
         
-    
     def __call__(self, niidir, header=False):
         self.niidir = niidir
         if os.path.isdir(self.niidir): pass
@@ -42,7 +41,7 @@ class bmp2nii():
             self.bmp2nii(OCT,datanum)
             print('all the bmp images are converted to nii.')
             cnt +=1
-    
+
 
     def bmp2nii(self, OCT, dnum):
         '''
@@ -81,4 +80,4 @@ class bmp2nii():
         print(nib_img.header)
         input()
 
-convert = bmp2nii(BMPDIR)(NIIDIR, header=False)
+convert = bmp2nii(BMPDIR)(NIIDIR, header=True)
