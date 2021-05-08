@@ -1,0 +1,200 @@
+{
+	"version" : "Configuration-OCTViewer-DME.json",
+	"pre_segmentation" : 
+	{
+		"cost_type" : "on-surface",
+		"downsampled_oct_voxel_size_y" : 0.012,
+		"graph_downsampling_factor_x" : 1, "graph_downsampling_factor_z" : 1, 
+		"local_mask_radius" : 1.000,
+		"nudge" : { "margin_x" : 0.060, "margin_y" : 0.030, "margin_z" : 0.060, "depth" : 100.0, "depth_ratio" : 1.00 },
+		"surface_num" : 4,
+		"surface" : 
+		[
+			{
+				"index" : 0,
+				"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.0075, "gaussian_sigma_z" : 0.015, "voxel_transition" : "dark_to_bright" },
+				"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 0.000 },
+				"local_constraint" : { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 0.000 },
+				"smoothing" : { "gaussian_sigma_x" : 0.100 }
+			},
+			{
+				"index" : 6,
+				"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.0075, "gaussian_sigma_z" : 0.015, "voxel_transition" : "dark_to_bright" },
+				"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.100, "maximum_surface_separation" : 2.000 },
+				"local_constraint" : { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.100, "maximum_surface_separation" : 2.000 },
+				"smoothing" : { "gaussian_sigma_x" : 0.100 }
+			},
+			{
+				"index" : 8,
+				"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.0075, "gaussian_sigma_z" : 0.015, "voxel_transition" : "dark_to_bright" },
+				"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.020, "maximum_surface_separation" : 2.000 },
+				"local_constraint" : { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.030, "maximum_surface_separation" : 2.000 },
+				"smoothing" : { "gaussian_sigma_x" : 0.100 }
+			},
+			{
+				"index" : 11,
+				"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.0075, "gaussian_sigma_z" : 0.015, "voxel_transition" : "bright_to_dark" },
+				"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.020, "maximum_surface_separation" : 2.000 },
+				"local_constraint" : { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.020, "maximum_surface_separation" : 2.000 },
+				"smoothing" : { "gaussian_sigma_x" : 0.200 }
+			}
+		]
+	},
+	"final_segmentation" : 
+	[
+		{
+			"cost_type" : "on-surface",
+			"oct" : { "top_surface_index" : 0, "top_margin" : -10, "bottom_surface_index" : 6, "bottom_margin" : -2 },
+			"graph_downsampling_factor_x" : 1, "graph_downsampling_factor_z" : 1, 
+			"local_mask_radius" : 1.500,
+			"nudge_fovea" : { "margin_x" : 0.200, "margin_y" : 0.020, "margin_z" : 0.200, "depth" : 0.01, "depth_ratio" : 1.00, "pos_y" : 0.004, "use" : true },
+			"nudge" :       { "margin_x" : 0.060, "margin_y" : 0.006, "margin_z" : 0.060, "depth" : 100.0, "depth_ratio" : 1.00 },
+			"surface_num" : 6,
+			"surface" : 
+			[
+				{
+					"index" : 0,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 0, "top_margin" : -0.030, "bottom_surface_index" : 0, "bottom_margin" : 0.030 },
+					"cost" : { "gaussian_sigma_x" : 0.045, "gaussian_sigma_y" : 0.010, "gaussian_sigma_z" : 0.045, "voxel_transition" : "dark_to_bright" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 0.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 1.0, "smoothness_ratio_z_to_y" : 1.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 0.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 1,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 0, "top_margin" : -0.010, "bottom_surface_index" : 6, "bottom_margin" : -0.030 },
+					"cost" : { "gaussian_sigma_x" : 0.030, "gaussian_sigma_y" : 0.004, "gaussian_sigma_z" : 0.030, "voxel_transition" : "bright_to_dark" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 1.0, "smoothness_ratio_z_to_y" : 1.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 2,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 0, "top_margin" : 0.004, "bottom_surface_index" : 6, "bottom_margin" : -0.030 },
+					"cost" : { "gaussian_sigma_x" : 0.030, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.030, "voxel_transition" : "dark_to_bright" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.010, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 1.0, "smoothness_ratio_z_to_y" : 1.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 3,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 0, "top_margin" : 0.004, "bottom_surface_index" : 6, "bottom_margin" : -0.030 },
+					"cost" : { "gaussian_sigma_x" : 0.045, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.045, "voxel_transition" : "bright_to_dark" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.010, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 1.0, "smoothness_ratio_z_to_y" : 1.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 4,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 0, "top_margin" : 0.004, "bottom_surface_index" : 6, "bottom_margin" : -0.030 },
+					"cost" : { "gaussian_sigma_x" : 0.045, "gaussian_sigma_y" : 0.008, "gaussian_sigma_z" : 0.045, "voxel_transition" : "dark_to_bright" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.010, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 1.0, "smoothness_ratio_z_to_y" : 1.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 5,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 0, "top_margin" : 0.004, "bottom_surface_index" : 6, "bottom_margin" : -0.030 },
+					"cost" : { "gaussian_sigma_x" : 0.045, "gaussian_sigma_y" : 0.008, "gaussian_sigma_z" : 0.045, "voxel_transition" : "bright_to_dark" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 2.0, "smoothness_ratio_z_to_y" : 2.0, "minimum_surface_separation" : 0.010, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 1.0, "smoothness_ratio_z_to_y" : 1.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				}
+			],
+			"region_num" : 7,
+			"region" : 
+			[
+				{ "index" : 0, "class" : "dark"  , "mean_voxel_intensity" :  9483.74, "sd_voxel_intensity" :  797.93 },
+				{ "index" : 1, "class" : "bright", "mean_voxel_intensity" : 28579.04, "sd_voxel_intensity" : 3147.19 },
+				{ "index" : 2, "class" : "medium", "mean_voxel_intensity" : 22196.17, "sd_voxel_intensity" : 2952.21 },
+				{ "index" : 3, "class" : "medium", "mean_voxel_intensity" : 22531.62, "sd_voxel_intensity" : 2801.07 },
+				{ "index" : 4, "class" : "medium", "mean_voxel_intensity" : 18095.96, "sd_voxel_intensity" : 2383.71 },
+				{ "index" : 5, "class" : "medium", "mean_voxel_intensity" : 19763.96, "sd_voxel_intensity" : 2822.56 },
+				{ "index" : 6, "class" : "medium", "mean_voxel_intensity" : 14630.93, "sd_voxel_intensity" : 1931.67 }
+			]
+		},
+		{
+			"cost_type" : "on-surface",
+			"oct" : { "top_surface_index" : 6, "top_margin" : -10, "bottom_surface_index" : 11, "bottom_margin" : 10 },
+			"graph_downsampling_factor_x" : 1, "graph_downsampling_factor_z" : 1, 
+			"local_mask_radius" : 0.0,
+			"nudge_fovea" : { "margin_x" : 0.000, "margin_y" : 0.000, "margin_z" : 0.000, "depth" : 0.00, "depth_ratio" : 0.00, "pos_y" : 0.000, "use" : false },
+			"nudge" :       { "margin_x" : 0.060, "margin_y" : 0.006, "margin_z" : 0.060, "depth" : 100.0, "depth_ratio" : 1.00 },
+			"surface_num" : 6,
+			"surface" : 
+			[
+				{
+					"index" : 6,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 6, "top_margin" : -0.020, "bottom_surface_index" : 6, "bottom_margin" : 0.020 },
+					"cost" : { "gaussian_sigma_x" : 0.030, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.030, "voxel_transition" : "dark_to_bright" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 0.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 0.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 7,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 6, "top_margin" : 0.000, "bottom_surface_index" : 11, "bottom_margin" : 0.000 },
+					"cost" : { "gaussian_sigma_x" : 0.030, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.030, "voxel_transition" : "bright_to_dark" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 8,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 6, "top_margin" : 0.000, "bottom_surface_index" : 11, "bottom_margin" : 0.000 },
+					"cost" : { "gaussian_sigma_x" : 0.045, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.045, "voxel_transition" : "dark_to_bright" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 9,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 6, "top_margin" : 0.000, "bottom_surface_index" : 11, "bottom_margin" : 0.000 },
+					"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.015, "voxel_transition" : "bright_to_dark" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 10,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 6, "top_margin" : 0.000, "bottom_surface_index" : 11, "bottom_margin" : 0.000 },
+					"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.015, "voxel_transition" : "dark_to_bright" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.000, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				},
+				{
+					"index" : 11,
+					"ratio_alpha" : 0.5,
+					"voi" : { "top_surface_index" : 11, "top_margin" : -0.030, "bottom_surface_index" : 11, "bottom_margin" : 0.000 },
+					"cost" : { "gaussian_sigma_x" : 0.015, "gaussian_sigma_y" : 0.002, "gaussian_sigma_z" : 0.015, "voxel_transition" : "bright_to_dark" },
+					"constraint" :       { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.010, "maximum_surface_separation" : 2.000 },
+					"local_constraint" : { "smoothness_ratio_x_to_y" : 12.0, "smoothness_ratio_z_to_y" : 12.0, "minimum_surface_separation" : 0.010, "maximum_surface_separation" : 2.000 },
+					"smoothing" : { "gaussian_sigma_x" : 0.100 }
+				}
+			],
+			"region_num" : 7,
+			"region" : 
+			[
+				{ "index" :  7, "class" : "dark"  , "mean_voxel_intensity" : 14630.93, "sd_voxel_intensity" : 1931.67 },
+				{ "index" :  8, "class" : "medium", "mean_voxel_intensity" : 29891.61, "sd_voxel_intensity" : 3458.26 },
+				{ "index" :  9, "class" : "medium", "mean_voxel_intensity" : 29551.70, "sd_voxel_intensity" : 3483.79 },
+				{ "index" : 10, "class" : "medium", "mean_voxel_intensity" : 34121.02, "sd_voxel_intensity" : 2517.85 },
+				{ "index" : 11, "class" : "medium", "mean_voxel_intensity" : 29551.70, "sd_voxel_intensity" : 3483.79 },
+				{ "index" : 12, "class" : "bright", "mean_voxel_intensity" : 37116.69, "sd_voxel_intensity" : 2430.85 },
+				{ "index" : 13, "class" : "medium", "mean_voxel_intensity" : 25419.02, "sd_voxel_intensity" : 1596.92 }
+			]
+		}
+	]
+}
