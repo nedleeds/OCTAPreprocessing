@@ -6,20 +6,30 @@ import nibabel   as nib
 import numpy     as np
 from skimage.color import rgb2gray
 
-BMPDIR = '/root/Share/data/OCTA-500_6M_OCT' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
-NIIDIR = '/root/Share/data/nii'
+BMPDIR_OCT   = '/root/Share/data/OCTA-500_6M_OCT' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
+BMPDIR_OCTA  = '/root/Share/data/OCTA-500_6M_OCTA' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
+NIIDIR_OCT   = '/root/Share/data/nii/OCT'
+NIIDIR_OCTA  ='/root/Share/data/nii/OCTA' 
 
 class bmp2nii():
     def __init__(self, DATADIR):
-        self.OCTs = []
-        self.i_OCTs = []
+        self.OCTs    = []
+        self.i_OCTs  = []
         self.datadir = DATADIR
-        self.niidir = ''
+        self.niidir  = ''
         self.niiname = ''
         self.niipath = ''
-        self.vol = 0
+        self.vol     = 0
         
     def __call__(self, niidir, header_=False):
+        # i  = nib.load(os.path.join(NIIDIR,'10004/10004_OCT_Iowa.nii.gz'))
+        i  = nib.load(os.path.join(NIIDIR_OCTA,'10001.nii.gz'))
+        # i2 = nib.load(os.path.join(NIIDIR,'10001.nii.gz'))
+        print(i.header)
+        print(i.get_fdata().shape)
+        # print(i2.header)
+        return 
+
         self.niidir = niidir
         if os.path.isdir(self.niidir): pass
         else: os.mkdir(self.niidir)
@@ -42,8 +52,6 @@ class bmp2nii():
             self.bmp2nii(OCT,datanum)
             print('all the bmp images are converted to nii.')
             cnt +=1
-        
-  
 
     def bmp2nii(self, OCT, dnum):
         '''
@@ -54,14 +62,16 @@ class bmp2nii():
         reader.SetFileNames(OCT_sorted)
         self.vol = reader.Execute()
 
-        image_array = sitk.GetArrayFromImage(self.vol)    #z, y, x
-        grayscale = rgb2gray(image_array)
-        g_image = sitk.GetImageFromArray(grayscale)
+        # # change RGB to GRAY ===> THIS SHOULD BE IMPLEMENTED ON PREPROCESSING
+        # image_array = sitk.GetArrayFromImage(self.vol)    #z, y, x
+        # grayscale = rgb2gray(image_array)
+        # g_image = sitk.GetImageFromArray(grayscale)
         
         # self.convertAxis() 
         self.niiname = f'{dnum}.nii.gz'
         self.niipath = os.path.join(self.niidir, self.niiname)
-        sitk.WriteImage(g_image, self.niipath)
+        # sitk.WriteImage(g_image, self.niipath)
+        sitk.WriteImage(self.vol, self.niipath)
         
         # adding header if there's header file's path
         if self.head_ : self.addHeader(dnum)
@@ -69,6 +79,30 @@ class bmp2nii():
         # nib_img= nib.load(self.nibpath)
         # print(nib_img.header)
 
+    def addHeader(self,dnum):
+        '''
+        add header
+        '''
+        nib_img= nib.load(self.niipath)
+        head = nib_img.header
+        head['dim'][0:4]=[3,400,640,400]
+        head['pixdim'][0:4]=[1.,15.,3.125,15.]
+        head['xyzt_units']='3'
+        head['qform_code']='0'
+
+        c = np.array(nib_img.get_fdata())
+        nib_img2 = nib.Nifti1Image(c, nib_img.affine, header=head)
+        head2 = nib_img2.header
+        head2['dim'][0:4]=[3,400,640,400] #<---------------Not working ...
+        head2['pixdim'][0:4]=[1,15,3.125,15]
+        head2['pixdim'][-2:]=[1,1]
+        head2['xyzt_units']='3'
+        head2['qform_code']='0'
+
+        self.nibname = dnum+'.nii.gz'
+        self.nibpath = os.path.join(NIIDIR_OCTA, self.nibname)
+
+        nib.save(nib_img2, self.nibpath)
 
     def convertAxis(self):
         # do I really need to convert axis? No I don't. rendering is working for world coordinate, and it's RAS.
@@ -81,31 +115,5 @@ class bmp2nii():
         print(f'after convert: S/I:{v.shape[0]}, A/P:{v.shape[1]}, R/L:{v.shape[2]}')
         self.vol = sitk.GetImageFromArray(v)
 
-    def addHeader(self,dnum):
-        '''
-        add header
-        '''
-        nib_img= nib.load(self.niipath)
-        # print(swi.header)
-        head = nib_img.header
-        head['dim'][0:4]=[3,400,640,400]
-        head['pixdim'][1:4]=[15,3.125,15]
-        head['xyzt_units']='3'
-        head['qform_code']='0'
-
-        c = np.array(nib_img.get_fdata())
-        nib_img2 = nib.Nifti1Image(c, nib_img.affine, header=head)
-        head2 = nib_img2.header
-        head2['dim'][0:4]=[3,400,640,400] #<---------------Not working ...
-        head2['pixdim'][1:4]=[15,3.125,15]
-        head2['xyzt_units']='3'
-
-        self.nibname = dnum+'.nii.gz'
-        self.nibpath = os.path.join(NIIDIR, self.nibname)
-
-        nib.save(nib_img2, self.nibpath)
         
-
-        
-        
-convert = bmp2nii(BMPDIR)(NIIDIR, header_=True)
+convert = bmp2nii(BMPDIR_OCTA)(NIIDIR_OCTA, header_=True)

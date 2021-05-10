@@ -37,7 +37,8 @@ RUN pip install --upgrade pip \
     tensorflow-probability==0.10.1 \
     SimpleITK \
     times \
-    nibabel
+    nibabel \
+    scikit-image
 
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)" -- \
     -t cloud \
