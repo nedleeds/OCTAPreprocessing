@@ -23,12 +23,12 @@ class bmp2nii():
         
     def __call__(self, niidir, header_=False):
         # i  = nib.load(os.path.join(NIIDIR,'10004/10004_OCT_Iowa.nii.gz'))
-        i  = nib.load(os.path.join(NIIDIR_OCTA,'10001.nii.gz'))
+        i  = nib.load(os.path.join(NIIDIR_OCT,'10001_oct.nii.gz'))
         # i2 = nib.load(os.path.join(NIIDIR,'10001.nii.gz'))
         print(i.header)
         print(i.get_fdata().shape)
         # print(i2.header)
-        return 
+        # return 
 
         self.niidir = niidir
         if os.path.isdir(self.niidir): pass
@@ -46,12 +46,13 @@ class bmp2nii():
 
         cnt = 0
         for OCT in self.OCTs:
-            # if cnt == 1: return
-            datanum=OCT.split('/')[-1]
-            print(f'[{datanum}] : ',end='')
-            self.bmp2nii(OCT,datanum)
-            print('all the bmp images are converted to nii.')
-            cnt +=1
+            if cnt == 4: 
+                datanum=OCT.split('/')[-1]
+                print(f'[{datanum}] : ',end='')
+                self.bmp2nii(OCT,datanum)
+                print('all the bmp images are converted to nii.')
+                return
+            else : cnt +=1
 
     def bmp2nii(self, OCT, dnum):
         '''
