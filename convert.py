@@ -8,8 +8,8 @@ from skimage.color import rgb2gray
 
 BMPDIR_OCT   = '/root/Share/data/OCTA-500_6M_OCT' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
 BMPDIR_OCTA  = '/root/Share/data/OCTA-500_6M_OCTA' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
-NIIDIR_OCT   = '/root/Share/data/nii/OCT'
-NIIDIR_OCTA  ='/root/Share/data/nii/OCTA' 
+NIIDIR_OCT   = '/root/Share/data/Nifti/In/OCT'
+NIIDIR_OCTA  ='/root/Share/data/Nifti/In/OCTA' 
 
 class bmp2nii():
     def __init__(self, DATADIR):
