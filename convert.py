@@ -46,9 +46,13 @@ class bmp2nii():
 
         cnt = 0
         for OCT in self.OCTs:
+            # datanum=OCT.split('/')[-1]
+            # print(f'[{datanum}] : ',end='')
+            # self.bmp2nii(OCT,datanum)
+            # print('all the bmp images are converted to nii.')
             if cnt == 4: 
                 datanum=OCT.split('/')[-1]
-                print(f'[{datanum}] : ',end='')
+                print(f'[{datanum}] : ')
                 self.bmp2nii(OCT,datanum)
                 print('all the bmp images are converted to nii.')
                 return
@@ -69,10 +73,10 @@ class bmp2nii():
         # g_image = sitk.GetImageFromArray(grayscale)
         
         # self.convertAxis() 
-        self.niiname = f'{dnum}.nii.gz'
-        self.niipath = os.path.join(self.niidir, self.niiname)
+        self.niiname = f'{dnum}_oct.nii.gz'
+        self.niipath = os.path.join(self.niidir, self.niiname) # ~/Nifti/In/OCT/10001.nii.gz
         # sitk.WriteImage(g_image, self.niipath)
-        sitk.WriteImage(self.vol, self.niipath)
+        sitk.WriteImage(self.vol, self.niipath) # make nii in ~/Nifti/In/OCT/10001.nii.gz
         
         # adding header if there's header file's path
         if self.head_ : self.addHeader(dnum)
@@ -84,7 +88,7 @@ class bmp2nii():
         '''
         add header
         '''
-        nib_img= nib.load(self.niipath)
+        nib_img= nib.load(self.niipath)  # load nii which just has been made in ~/Nifti/In/OCT/10001.nii.gz
         head = nib_img.header
         head['dim'][0:4]=[3,400,640,400]
         head['pixdim'][0:4]=[1.,15.,3.125,15.]
@@ -94,16 +98,17 @@ class bmp2nii():
         c = np.array(nib_img.get_fdata())
         nib_img2 = nib.Nifti1Image(c, nib_img.affine, header=head)
         head2 = nib_img2.header
-        head2['dim'][0:4]=[3,400,640,400] #<---------------Not working ...
+        head2['dim'][0:4]=[3,400,640,400]
         head2['pixdim'][0:4]=[1,15,3.125,15]
         head2['pixdim'][-2:]=[1,1]
         head2['xyzt_units']='3'
         head2['qform_code']='0'
 
-        self.nibname = dnum+'.nii.gz'
-        self.nibpath = os.path.join(NIIDIR_OCTA, self.nibname)
+        # this is for saving octa volume
+        # self.nibname = dnum+'_octa.nii.gz'
+        # self.nibpath = os.path.join(NIIDIR_OCTA, self.nibname)
 
-        nib.save(nib_img2, self.nibpath)
+        nib.save(nib_img2, self.niipath) # saving with as same as nifti name that I've just made.
 
     def convertAxis(self):
         # do I really need to convert axis? No I don't. rendering is working for world coordinate, and it's RAS.
@@ -116,5 +121,5 @@ class bmp2nii():
         print(f'after convert: S/I:{v.shape[0]}, A/P:{v.shape[1]}, R/L:{v.shape[2]}')
         self.vol = sitk.GetImageFromArray(v)
 
-        
-convert = bmp2nii(BMPDIR_OCTA)(NIIDIR_OCTA, header_=True)
+convert = bmp2nii(BMPDIR_OCT)(NIIDIR_OCT, header_=True)      
+# convert = bmp2nii(BMPDIR_OCTA)(NIIDIR_OCTA, header_=True)
