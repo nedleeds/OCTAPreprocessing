@@ -1,125 +1,141 @@
-import cv2
+import os
 import glob
-import os, shutil
-import SimpleITK as sitk
-import nibabel   as nib
 import numpy     as np
+import nibabel   as nib
+import SimpleITK as sitk
 from skimage.color import rgb2gray
 
-BMPDIR_OCT   = '/root/Share/data/OCTA-500_6M_OCT' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
-BMPDIR_OCTA  = '/root/Share/data/OCTA-500_6M_OCTA' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
-NIIDIR_OCT   = '/root/Share/data/Nifti/In/OCT'
-NIIDIR_OCTA  ='/root/Share/data/Nifti/In/OCTA' 
 
-class bmp2nii():
-    def __init__(self, DATADIR):
+BMPDIR_OCT   = './data/OCTA-500_6M_OCT' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
+BMPDIR_OCTA  = './data/OCTA-500_6M_OCTA' # BMPDIR is path for directory which has many directories that has a bunch of bmp images.
+NIIDIR_OCT   = './data/Nifti/In/FOV_66/OCT'
+NIIDIR_OCTA  = './data/Nifti/In/FOV_66/OCTA'
+NIIDIR_BEFORE= './data/Nifti/In/FOV_66/HeaderTest/Before' 
+NIIDIR_AFTER = './data/Nifti/In/FOV_66/HeaderTest/After/OCT' 
+NIIDIR_CVLT  = './data/Nifti/In/FOV_66/Curvelet_SRL' 
+NII_HEADER_PATH  = './data/Nifti/In/FOV_66/OCT/Segmented/10001_oct/10001_oct_OCT_Iowa.nii.gz'
+
+class bmp2nifti():
+    def __init__(self, BMPDIR):
         self.OCTs    = []
-        self.i_OCTs  = []
-        self.datadir = DATADIR
+        self.bmpdir = BMPDIR
         self.niidir  = ''
         self.niiname = ''
         self.niipath = ''
         self.vol     = 0
         
-    def __call__(self, niidir, header_=False):
-        # i  = nib.load(os.path.join(NIIDIR,'10004/10004_OCT_Iowa.nii.gz'))
-        i  = nib.load(os.path.join(NIIDIR_OCT,'10001_oct.nii.gz'))
-        # i2 = nib.load(os.path.join(NIIDIR,'10001.nii.gz'))
-        print(i.header)
-        print(i.get_fdata().shape)
-        # print(i2.header)
-        # return 
+    def __call__(self, NIIDIR):
+        self.checkNiiDir(NIIDIR)
 
+        dir_nums = list(self.getDirNums())
+        
+        for idx in dir_nums:
+            bmp_path = os.path.join(self.bmpdir, str(idx))
+            nii_path = os.path.join(self.niidir, str(idx))
+            if idx>10199: self.bmp2nii(bmp_path, nii_path)
+            else: pass
+            print(f"{idx} has been converted.")
+
+    def checkNiiDir(self, niidir):
+        if os.path.isdir(niidir): pass
+        else: os.mkdir(niidir)
         self.niidir = niidir
-        if os.path.isdir(self.niidir): pass
-        else: os.mkdir(self.niidir)
-        self.head_ = header_
-
-        for f in os.listdir(self.datadir):
+    
+    def getDirNums(self):
+        dirNums = []
+        for f in os.listdir(self.bmpdir):
             idx = f.split('.')[0]           # OCT file has 5 legth number like 10001
             if len(idx)==5:                 # not rendered data.
-                self.i_OCTs.append(int(idx))
-
-        self.i_OCTs = sorted(self.i_OCTs)
-        for i in self.i_OCTs:
-            self.OCTs.append(os.path.join(self.datadir,str(i)))
-
-        cnt = 0
-        for OCT in self.OCTs:
-            # datanum=OCT.split('/')[-1]
-            # print(f'[{datanum}] : ',end='')
-            # self.bmp2nii(OCT,datanum)
-            # print('all the bmp images are converted to nii.')
-            if cnt == 4: 
-                datanum=OCT.split('/')[-1]
-                print(f'[{datanum}] : ')
-                self.bmp2nii(OCT,datanum)
-                print('all the bmp images are converted to nii.')
-                return
-            else : cnt +=1
-
-    def bmp2nii(self, OCT, dnum):
-        '''
-        making multiple bmp files to one nii.gz file
-        '''
-        OCT_sorted = sorted(glob.glob(os.path.join(OCT,'*.bmp')), key=os.path.getmtime) # sorting files in directory
+                dirNums.append(int(idx))
+        dirNums = sorted(dirNums)
+        yield from dirNums
+        
+    def bmp2nii(self, bmp_path, NII_PATH):
+        bmp_sorted = sorted(glob.glob(os.path.join(bmp_path,'*.bmp')), key=lambda x: int(x.split('/')[-1].split('.')[0]))
         reader = sitk.ImageSeriesReader()
-        reader.SetFileNames(OCT_sorted)
-        self.vol = reader.Execute()
+        reader.SetFileNames(bmp_sorted)
+        nifti = reader.Execute()
+        nifti = sitk.GetArrayFromImage(nifti)
+        nifti = np.sum(nifti, axis=-1)/3 # RGB -> GRAY
+        nifti = next(self.convertAxis(nifti))
 
-        # # change RGB to GRAY ===> THIS SHOULD BE IMPLEMENTED ON PREPROCESSING
-        # image_array = sitk.GetArrayFromImage(self.vol)    #z, y, x
-        # grayscale = rgb2gray(image_array)
-        # g_image = sitk.GetImageFromArray(grayscale)
+        NII_PATH = NII_PATH + ".nii"
+        self.addHeader(NII_HEADER_PATH, NII_PATH, nifti)
+
+    def addHeader(self, nii_header_path, nii_dst_dir, nifti):
+        nifti_header = nib.load(nii_header_path)
+        header = nifti_header.header  # get IOWA Header file
+        header['data_type'] = b'uint8'
+        header['db_name'] = b'IEEE-OCTA500'
+        header['dim_info']=b'3'
+        header['dim'][0:4]=[3,400,640,400]
+        header['pixdim'][0:4]=[1.,15.,3.125,15.]
+        header['datatype'] = b'2'
+        header['slice_start'] = b'0'
+        header['slice_end'] = b'639'
+        header['slice_code'] = b'2'
+        header['xyzt_units'] = b'3'
+        header['cal_max'] = float(f"{np.max(nifti)}")
+        header['cal_min'] = float(f"{np.min(nifti)}")
+        header['descrip'] = "Convert from .bmp to Nifti by DHL(email:llee.dh@gmail.com)"
+        new_affine = np.asarray([[-15.0,0.,0.,0.], 
+                                 [0.,-3.125,0.,0.], 
+                                 [0.,0.,15.,0.], 
+                                 [0.,0.,0.,1.]])
+
+        nifti_new = nib.Nifti1Image(nifti, affine=new_affine, header=header)  
+        nifti_num = nii_dst_dir.split('.')[1].split('/')[-1]
+        nii_dir_dst = os.path.join(nii_dst_dir, f"{nifti_num}.nii")
+        nib.save(nifti_new, nii_dst_dir) # saving with as same as nifti name that I've just made.
+
+        #check
+        v = nib.load(nii_dst_dir)
+        print(v.header['cal_max'], v.header['cal_min'])
+
+    def convertAxis(self, v):
+        v=v.transpose(2,1,0)
+        yield v
+
+convert = bmp2nifti(BMPDIR_OCT)(NIIDIR_AFTER)      
+# convert = bmp2nifti(BMPDIR_OCTA)(NIIDIR_AFTER)
+
+
+class modifyHeader():
+    def __init__(self,nii_dir_src):
+        self.nii_dir_src = nii_dir_src
         
-        # self.convertAxis() 
-        self.niiname = f'{dnum}_oct.nii.gz'
-        self.niipath = os.path.join(self.niidir, self.niiname) # ~/Nifti/In/OCT/10001.nii.gz
-        # sitk.WriteImage(g_image, self.niipath)
-        sitk.WriteImage(self.vol, self.niipath) # make nii in ~/Nifti/In/OCT/10001.nii.gz
+    def __call__(self, nii_dir_dst):
+        self.nii_dir_dst = nii_dir_dst
+        nii_sorted = sorted(glob.glob(os.path.join(self.nii_dir_src,'*.nii.gz')), key=lambda x: int(x.split('/')[-1].split('.')[0].split('_')[0]))
+        for c in nii_sorted:
+            self.modifiyHeader(str(c))
+            print(c.split('/')[-1].split('.')[0], "has been updated")
+
+    
+    def modifiyHeader(self, niipath):
+        nifti = nib.load(niipath)  # load nii which just has been made in ~/Nifti/In/OCT/10001.nii.gz
+        nifti_img = next(self.normalizing(nifti.get_fdata()))
+        nifti_header = nifti.header
+        nifti_header['data_type'] = b'uint8'
+        nifti_header['db_name'] = b'IEEE-OCTA500'
+        nifti_header['dim_info']="3"
+        nifti_header['dim'][0:4]=[3,400,640,400]
+        nifti_header['pixdim'][0:4]=[1.,15.,3.125,15.]
+        nifti_header['datatype'] = "2"
+        nifti_header['xyzt_units'] = "3"
+        nifti_header['cal_max'] = float(f"{np.max(nifti_img)}")
+        nifti_header['cal_min'] = float(f"{np.min(nifti_img)}")
+        nifti_header['descrip'] = "Convert from .bmp to Nifti by DHL(email:llee.dh@gmail.com)"
         
-        # adding header if there's header file's path
-        if self.head_ : self.addHeader(dnum)
-        
-        # nib_img= nib.load(self.nibpath)
-        # print(nib_img.header)
+        nifti_new = nib.Nifti1Image(nifti_img, nifti.affine, header=nifti_header)  
+        nifti_num = niipath.split('.')[0].split('/')[-1]
+        nii_dir_dst = os.path.join(self.nii_dir_dst, f"{nifti_num}.nii")
+        nib.save(nifti_new, nii_dir_dst) # saving with as same as nifti name that I've just made.
 
-    def addHeader(self,dnum):
-        '''
-        add header
-        '''
-        nib_img= nib.load(self.niipath)  # load nii which just has been made in ~/Nifti/In/OCT/10001.nii.gz
-        head = nib_img.header
-        head['dim'][0:4]=[3,400,640,400]
-        head['pixdim'][0:4]=[1.,15.,3.125,15.]
-        head['xyzt_units']='3'
-        head['qform_code']='0'
+    def normalizing(self, volume):
+        M = np.max(volume)
+        m = np.min(volume)
+        volume = ((volume-m)/(M-m))
 
-        c = np.array(nib_img.get_fdata())
-        nib_img2 = nib.Nifti1Image(c, nib_img.affine, header=head)
-        head2 = nib_img2.header
-        head2['dim'][0:4]=[3,400,640,400]
-        head2['pixdim'][0:4]=[1,15,3.125,15]
-        head2['pixdim'][-2:]=[1,1]
-        head2['xyzt_units']='3'
-        head2['qform_code']='0'
-
-        # this is for saving octa volume
-        # self.nibname = dnum+'_octa.nii.gz'
-        # self.nibpath = os.path.join(NIIDIR_OCTA, self.nibname)
-
-        nib.save(nib_img2, self.niipath) # saving with as same as nifti name that I've just made.
-
-    def convertAxis(self):
-        # do I really need to convert axis? No I don't. rendering is working for world coordinate, and it's RAS.
-        # -> As data was collected with this coordinate, I don't need to convert the axes for rendering.
-        v = sitk.GetArrayFromImage(self.vol) # S/I:400(x), A/P:640(y), R/L: 400(z) normal coordinate (matched with real eye position)
-        v = np.swapaxes(v,1,0)               # S/I:640(y), A/P:400(x), R/L: 400(z)
-        v = np.swapaxes(v,1,2)               # S/I:640(y), A/P:400(z), R/L: 400(x)
-        v = np.flipud(v)                     # S/I:640(y), A/P:400(z), R/L: 400(x) --> flip up and down
-        
-        print(f'after convert: S/I:{v.shape[0]}, A/P:{v.shape[1]}, R/L:{v.shape[2]}')
-        self.vol = sitk.GetImageFromArray(v)
-
-convert = bmp2nii(BMPDIR_OCT)(NIIDIR_OCT, header_=True)      
-# convert = bmp2nii(BMPDIR_OCTA)(NIIDIR_OCTA, header_=True)
+        yield volume
+# modify_header = modifyHeader(NIIDIR_BEFORE)(NIIDIR_AFTER)
