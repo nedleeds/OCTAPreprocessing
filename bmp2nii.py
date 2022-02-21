@@ -50,7 +50,8 @@ class bmp2nifti():
         sitk.WriteImage(nifti_img, save_path)
 
         self.modify_header(load_path=save_path)
-        print(f"{idx} has been converted.")
+        retina = 'OCTA' if 'OCTA' in save_path else 'OCT'
+        print(f"{retina}-{idx} has been converted.")
 
     def modify_header(self, load_path):
         nifti_img = nib.load(load_path)
