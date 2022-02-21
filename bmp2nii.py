@@ -73,31 +73,6 @@ class bmp2nifti():
 
         nifti_new_img = nib.Nifti1Image(nifti_data, nifti_info_new.get_best_affine())
         nib.save(nifti_new_img, load_path)
-        
-        # sitk_img = sitk.ReadImage(load_path, sitk.sitkUInt8)
-        # sitk_img = sitk.Cast(sitk.RescaleIntensity(sitk_img), sitk.sitkUInt8)
-        # sitk.WriteImage(sitk_img, load_path)
-
-class modify_nifti_header(bmp2nifti):
-    def __init__(self) -> None:
-        super.__init__()
-        self.physical_resolution = {}
-
-    def set_nifti_resolution(self, nii_size, physical_resolution):
-        assert nii_size == self.nii_size, 'your nifti size setting  is different from loaded.'
-        height_nii, width_nii, depth_nii = nii_size
-        height_res, width_res, depth_res = physical_resolution
-        self.nii_size = {'height' : height_nii, 'width' : width_nii, 'depth' : depth_nii}
-        self.physical_resolution = {'height' : height_res, 'width' : width_res, 'depth' : depth_res}
-    
-    def check_volume_info(self):
-        nii_size = self.nii_size
-        fov_size = self.fov_size
-        self.physical_resolution = { k:nii_size[k]*fov_size[k] for k in ['height', 'width', 'depth'] }
-        
-        for k in self.physical_resolution:
-            print(f'{k:6} of physical resolution :{self.physical_resolution[k]} mm')
-
 
 def main():
     scale = 19*3
@@ -116,14 +91,5 @@ def main():
         converter.set_dir(load_dir=b_dir, save_dir=n_dir)
         converter.start_convert()
 
-    # # This part is about modifying header info for 
-    # # proper 3D render view based on FOV.
-    
-    
-    # modifier = modify_nifti_header(converter)
-    # modifier.set_nifti_resolution(nii_size = nii33_size,
-    #                               physical_resolution = output_resolution)
-    # modifier.check_volume_info()
-    
 
 main()
