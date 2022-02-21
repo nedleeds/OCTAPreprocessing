@@ -27,7 +27,7 @@ class bmp2nifti():
         for subject in subject_list:
             subject_bmp_dir = os.path.join(self.bmp_dir, subject)
             self.bmp2nii(idx=subject, load_dir=subject_bmp_dir, save_dir=self.nii_dir)
-            break
+            # break
             
         
     def bmp2nii(self, idx, load_dir, save_dir):
@@ -57,20 +57,21 @@ class bmp2nifti():
         nifti_data = nifti_img.dataobj
         nifti_info = nifti_img.header
 
-        w_resolution, h_resolution, d_resolution = self.info['resolution']
+        # w_resolution, h_resolution, d_resolution = self.info['resolution']
+        w_spacing, h_spacing, d_spacing = self.info['spacing']
         w_origin, h_origin, d_origin = self.info['origin']
 
         nifti_info_new =nifti_info
         nifti_info_new['xyzt_units'] = 0
-        nifti_info_new['pixdim'] = [1., w_resolution, h_resolution, d_resolution, 1., 1., 1., 1.]
-        nifti_info_new['qoffset_x'] = w_origin
-        nifti_info_new['qoffset_y'] = h_origin
+        nifti_info_new['pixdim'] = [1., w_spacing, h_spacing, d_spacing, 1., 1., 1., 1.]
+        nifti_info_new['qoffset_x'] = -w_origin
+        nifti_info_new['qoffset_y'] = - h_origin
         nifti_info_new['qoffset_z'] = d_origin
-        nifti_info_new['srow_x'] = [w_resolution, 0, 0, w_origin]
-        nifti_info_new['srow_y'] = [0, h_resolution, 0, h_origin]
-        nifti_info_new['srow_z'] = [0, 0, d_resolution, d_origin]
+        nifti_info_new['srow_x'] = [-w_spacing, 0, 0, -w_origin]
+        nifti_info_new['srow_y'] = [0, -h_spacing, 0, -h_origin]
+        nifti_info_new['srow_z'] = [0, 0,  d_spacing,  d_origin]
 
-        nifti_new_img = nib.Nifti1Image(nifti_img.dataobj, nifti_info_new.get_best_affine())
+        nifti_new_img = nib.Nifti1Image(nifti_data, nifti_info_new.get_best_affine())
         nib.save(nifti_new_img, load_path)
         
         # sitk_img = sitk.ReadImage(load_path, sitk.sitkUInt8)
@@ -99,12 +100,13 @@ class modify_nifti_header(bmp2nifti):
 
 
 def main():
-    scale = 38*2
+    scale = 19*3
     fov33_size = (3, 2, 3)  # fov66_size = (6, 6, 2)
-    nii33_size = (304, 604, 304)    # nii66_size = (400, 640, 400)
-    resolution = [(f/v)*scale for f,v in zip(fov33_size, nii33_size)]
-    origin = [-(r*v)//2 for r,v in zip(resolution, nii33_size)]
-    header_info = {'origin':origin, 'resolution':resolution}
+    nii33_size = (304, 640, 304)    # nii66_size = (400, 640, 400)
+    resolution = [(f*scale) for f in fov33_size]
+    spacing = [(r/v) for r,v in zip(resolution, nii33_size)]
+    origin = [-r//2 for r in resolution]
+    header_info = {'origin':origin, 'resolution':resolution, 'spacing':spacing}
 
     # This part is about converting bmp files to nifti.
     bmp_dir = ['/data/IEEE-OCT500/FOV_3MM/OCT', '/data/IEEE-OCT500/FOV_3MM/OCTA']
