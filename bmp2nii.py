@@ -6,7 +6,7 @@ import nibabel   as nib
 import SimpleITK as sitk
 from skimage.color import rgb2gray
 
-class bmp2nifti():
+class Bmp2Nifti():
     def __init__(self, header_information):
         self.bmp_dir = ''
         self.nii_dir = ''
