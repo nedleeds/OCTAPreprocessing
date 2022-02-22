@@ -87,7 +87,7 @@ def main():
     # This part is about converting bmp files to nifti.
     bmp_dir = ['/data/IEEE-OCT500/FOV_3MM/OCT', '/data/IEEE-OCT500/FOV_3MM/OCTA']
     nii_dir = ['/data/Nifti/In/FOV_33/OCT','/data/Nifti/In/FOV_33/OCTA']
-    converter = bmp2nifti(header_information=header_info)
+    converter = Bmp2Nifti(header_information=header_info)
     for b_dir, n_dir in zip(bmp_dir, nii_dir):
         converter.set_dir(load_dir=b_dir, save_dir=n_dir)
         converter.start_convert()
