@@ -100,38 +100,38 @@ def get_bspline_map(is_mask):
     if is_mask:
         map_bspline['FinalBSplineInterpolationOrder']=['0']
 
-def get_parameter_map(fix_path, subject, mov_before_dir, mov_after_dir, parameter_dir, is_mask=False):
-    os.makedirs(mov_after_dir, exist_ok=True)
+def get_parameter_map(fix_path, subject, move_before_dir, move_after_dir, parameter_dir, is_mask=False):
+    ''' 1) check save directory & set the path'''
+    os.makedirs(move_after_dir, exist_ok=True)
     os.makedirs(parameter_dir, exist_ok=True)
 
-    mov_before_path = os.path.join(mov_before_dir, f'{subject}.nii.gz')
-    mov_after_path = os.path.join(mov_after_dir, f'{subject}.nii.gz')
+    kind = 'mask' if 'VolMask' in move_before_dir else 'octa' if 'OCTA' in move_before_dir else 'oct'
+    mov_before_path = os.path.join(move_before_dir, f'{subject}.nii.gz')
+    mov_after_path = os.path.join(move_after_dir, f'{subject}_{kind}_translate_rigid.nii.gz')
 
     map_translate_path = os.path.join(parameter_dir, f'{subject}_translate.txt')
     map_rigid_path = os.path.join(parameter_dir, f'{subject}_rigid.txt')
     # map_affine_path = os.path.join(parameter_dir, f'{subject}_affine.txt')
     # map_bspline_path = os.path.join(parameter_dir, f'{subject}_bspline.txt')
 
-    #### Init Elastix filter and set the fix and moving image. ####
+    ''' 2) init Elastix filter and set the fix and moving image ''' 
     elastix_img_filter = sitk.ElastixImageFilter()
-    elastix_img_filter.LogToConsoleOn()
+    elastix_img_filter.LogToConsoleOff()
     elastix_img_filter.SetFixedImage(sitk.ReadImage(fix_path, sitk.sitkUInt8))
     elastix_img_filter.SetMovingImage(sitk.ReadImage(mov_before_path, sitk.sitkUInt8))
 
-    #### Set the parameter vector for transformation ####
-    parameter_vector = sitk.VectorOfParameterMap()
-
-    map_translation = get_translation_map()
-    map_rigid = get_rigid_map(is_mask)
+    ''' 3) set the parameter vector for transformation '''
+    parameter_vector = sitk.VectorOfParameterMap()  # init
+    map_translation = get_translation_map() # get map
+    map_rigid = get_rigid_map(is_mask) 
     # map_affine = get_affine_map(is_mask)
     # map_bspline = get_bspline_map(is_mask)
-    
-    parameter_vector.append(map_translation)
+    parameter_vector.append(map_translation) # set parameter vector
     parameter_vector.append(map_rigid)
     # parameter_vector.append(map_affine)
     # parameter_vector.append(map_bspline)
 
-    #### Do Transform ####
+    ''' 4) transform with parameter vector'''
     elastix_img_filter.SetParameterMap(parameter_vector)
     if is_mask:
         elastix_img_filter.SetParameter("MaximumNumberOfSamplingAttempts",'100')
@@ -139,14 +139,14 @@ def get_parameter_map(fix_path, subject, mov_before_dir, mov_after_dir, paramete
         # elastixImageFilter.SetParameter("ImageSampler", 'RandomSparseMask')
     elastix_img_filter.Execute()
 
-    #### Save ParameterMap ####
+    ''' 5) save parameter map '''
     sitk.WriteParameterFile(elastix_img_filter.GetTransformParameterMap()[0], map_translate_path)
     sitk.WriteParameterFile(elastix_img_filter.GetTransformParameterMap()[1], map_rigid_path)
     # sitk.WriteParameterFile(elastix_img_filter.GetTransformParameterMap()[2], map_affine_path)        
     # sitk.WriteParameterFile(elastix_img_filter.GetTransformParameterMap()[3], map_bspline_path)        
         
-   # Save path
-    # Save Nifti Image which is transformed
+   
+    ''' 6) save Nifti Image which has been transformed'''
     result_image = elastix_img_filter.GetResultImage()
     result_image = sitk.Cast(result_image, sitk.sitkUInt8)
     header_nii_path = '/data/Nifti/In/FOV_66/OCT_Resized/10001_oct_fov66_original.nii.gz'
@@ -156,33 +156,122 @@ def get_parameter_map(fix_path, subject, mov_before_dir, mov_after_dir, paramete
     result_image.SetDirection(header_image.GetDirection())
     sitk.WriteImage(result_image, mov_after_path)
 
-    print(f'{subject} paramters are saved at {parameter_dir}.')
+    print(f'\r{kind:>4} : {subject} has been transformed.', end='')
+
+def use_parameter_map(subject, move_before_dir, move_after_dir, parameter_dir, is_mask=False):
+    ''' 1) set the path '''
+    kind = 'mask' if 'VolMask' in move_before_dir else 'octa' if 'OCTA' in move_before_dir else 'oct'
+    os.makedirs(move_after_dir, exist_ok=True)
+    before_path = os.path.join(move_before_dir, f'{subject}.nii.gz')
+    after_path = os.path.join(move_after_dir, f'{subject}_{kind}_translate_rigid.nii.gz')
+
+    ''' 2) read paramters from saved .txt files & set parameter vector'''
+    map_path_translate = os.path.join(parameter_dir,f'{subject}_translate.txt')
+    map_path_rigid = os.path.join(parameter_dir,f'{subject}_rigid.txt')
+    # map_path_affine = os.path.join(parameter_dir,f'{subject}_affine.txt')
+    # map_path_bspline = os.path.join(parameter_dir,f'{subject}_bspline.txt')
+    parameter_path = [map_path_translate, map_path_rigid]
+    # parameter_path = [map_path_translate, map_path_rigid, map_path_affine]
+    parameter_vector = sitk.VectorOfParameterMap()
+    transform_img_filter = sitk.TransformixImageFilter()
+    transform_img_filter.LogToConsoleOff()
+
+    for p in parameter_path:
+        parameter_map = sitk.ReadParameterFile(p)
+        if is_mask:
+            parameter_map['FinalBSplineInterpolationOrder']=['0']
+        parameter_vector.append(parameter_map)
+    
+
+    """2) read moving mage"""
+    move = sitk.ReadImage(before_path, sitk.sitkUInt8)
+    transform_img_filter.SetMovingImage(move)
+
+    """3) transform with parameter vector"""
+    transform_img_filter.SetTransformParameterMap(parameter_vector)
+    transform_img_filter.Execute()
+    result_image = transform_img_filter.GetResultImage()
+
+    """4) type casting : Float32 -> uInt8"""
+    result_image = sitk.Cast(result_image, sitk.sitkUInt8)
+
+    """5) save casted Image"""
+    if 'FOV_66' in move_before_dir:
+        header_nii_path = '/data/Nifti/In/FOV_66/OCT_Resized/10001_oct_fov66_original.nii.gz'
+    else:
+        header_nii_path = '/data/Nifti/In/FOV_33/OCT_Resized/10334_oct_fov33_original.nii.gz'
+    header_image = sitk.ReadImage(header_nii_path, sitk.sitkUInt8)
+    result_image.SetSpacing(header_image.GetSpacing())
+    result_image.SetOrigin(header_image.GetOrigin())
+    result_image.SetDirection(header_image.GetDirection())
+    sitk.WriteImage(result_image, after_path)
+    print(f'\r{kind:>4} : {subject} has been transformed.')
+
 
 def main():
-    reference_path = {'FOV66' : '/data/Nifti/In/FOV_66/OCT/10132.nii.gz',
+    reference_path = {'FOV66' : '/data/Nifti/In/FOV_66/VolMask/10132.nii.gz',#'/data/Nifti/In/FOV_66/OCT/10132.nii.gz',
                       'FOV33' : '/data/Nifti/In/FOV_33/OCT/10334.nii.gz'}
 
-    subject_list = [s for s in range(10001, 10301)]
+    subject_list = {'FOV66' : [s for s in range(10001, 10301)],
+                    'FOV33' : [s for s in range(10301, 10501)]}
 
     oct_dir = {'FOV66' : {'before' : '/data/Nifti/In/FOV_66/OCT/',
-                          'after' : '/data/Nifti/In/FOV_66/OCT_Transformed/'},                          
+                          'after' : '/data/Nifti/In/Transformed/FOV_66/OCT'},                          
                'FOV33' : {'before' : '/data/Nifti/In/FOV_33/OCT/',
-                          'after' : '/data/Nifti/In/FOV_33/OCT_Transformed/'}}
+                          'after' : '/data/Nifti/In/Transformed/FOV_33/OCT'}}
 
     octa_dir = {'FOV66' : {'before' : '/data/Nifti/In/FOV_66/OCTA/',
-                           'after' : '/data/Nifti/In/FOV_66/OCTA_Transformed/'},                          
+                           'after' : '/data/Nifti/In/FOV_66/Transformed/OCTA'},
                 'FOV33' : {'before' : '/data/Nifti/In/FOV_33/OCTA/',
-                           'after' : '/data/Nifti/In/FOV_33/OCTA_Transformed/'}}
+                           'after' : '/data/Nifti/In/Transformed/FOV_33/OCTA'}}
+
+    mask_dir = {'FOV66' : {'before' : '/data/Nifti/In/FOV_66/VolMask',
+                           'after' : '/data/Nifti/In/Transformed/FOV_66/VolMask/'},
+                'FOV33' : {}}
 
     map_dir = {'FOV66' : '/data/Nifti/In/FOV_66/Parameter',
                'FOV33' : '/data/Nifti/In/FOV_33/Parameter'}
 
-    for subject_idx in subject_list:
-        get_parameter_map(fix_path = reference_path['FOV66'], 
+    # for subject_idx in subject_list['FOV66']:
+    #     get_parameter_map(fix_path = reference_path['FOV66'], 
+    #                       subject = subject_idx, 
+    #                       move_before_dir = mask_dir['FOV66']['before'], 
+    #                       move_after_dir = mask_dir['FOV66']['after'], 
+    #                       parameter_dir = map_dir['FOV66'], 
+    #                       is_mask=True)
+
+    #     use_parameter_map(subject = subject_idx, 
+    #                       move_before_dir = oct_dir['FOV66']['before'], 
+    #                       move_after_dir = oct_dir['FOV66']['after'], 
+    #                       parameter_dir = map_dir['FOV66'], 
+    #                       is_mask=True)
+
+    #     use_parameter_map(subject = subject_idx, 
+    #                       move_before_dir = octa_dir['FOV66']['before'], 
+    #                       move_after_dir = octa_dir['FOV66']['after'], 
+    #                       parameter_dir = map_dir['FOV66'], 
+    #                       is_mask=True)
+
+    for subject_idx in subject_list['FOV33']:
+        get_parameter_map(fix_path = reference_path['FOV33'], 
                           subject = subject_idx, 
-                          mov_before_dir = oct_dir['FOV66']['before'], 
-                          mov_after_dir = oct_dir['FOV66']['after'], 
-                          parameter_dir = map_dir['FOV66'], 
-                          is_mask=False)
+                          move_before_dir = oct_dir['FOV33']['before'], 
+                          move_after_dir = oct_dir['FOV33']['after'], 
+                          parameter_dir = map_dir['FOV33'], 
+                          is_mask=True)
+        
+        use_parameter_map(subject = subject_idx, 
+                          move_before_dir = octa_dir['FOV33']['before'], 
+                          move_after_dir = octa_dir['FOV33']['after'], 
+                          parameter_dir = map_dir['FOV33'], 
+                          is_mask=True)
+        
+        # use_parameter_map(subject = subject_idx, 
+        #                   move_before_dir = mask_dir['FOV66']['before'], 
+        #                   move_after_dir = mask_dir['FOV66']['after'], 
+        #                   parameter_dir = map_dir['FOV66'], 
+        #                   is_mask=True)
+
+
 
 main()
