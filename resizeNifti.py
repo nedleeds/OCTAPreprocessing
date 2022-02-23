@@ -166,12 +166,12 @@ def main():
     resized_dir = {'FOV66' : ['/data/Nifti/In/FOV_66/OCT_Resized', '/data/Nifti/In/FOV_66/OCTA_Resized'],
                    'FOV33' : ['/data/Nifti/In/FOV_33/OCT_Resized', '/data/Nifti/In/FOV_33/OCTA_Resized']}
 
-    subject_list = {'FOV66' : [subject for subject in range(10001, 10301)],
-                    'FOV33' : [subject for subject in range(10301, 10501)]}
-    # subject_list = {'FOV66' : [10001, 10062],
-    #                 'FOV33' : [10301, 10334]}
+    # subject_list = {'FOV66' : [subject for subject in range(10001, 10301)],
+    #                 'FOV33' : [subject for subject in range(10301, 10501)]}
+    subject_list = {'FOV66' : [10132, 10002],
+                    'FOV33' : [10301, 10334]}
 
-    croped_size = (262, 640, 262)
+    croped_size = (200, 640, 200)
     resized_size = (256, 640, 256)
     original_size = {'FOV66' : (400, 640, 400),
                      'FOV33' : (304, 640, 304)}
