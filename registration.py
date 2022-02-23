@@ -232,39 +232,39 @@ def main():
     map_dir = {'FOV66' : '/data/Nifti/In/FOV_66/Parameter',
                'FOV33' : '/data/Nifti/In/FOV_33/Parameter'}
 
-    # for subject_idx in subject_list['FOV66']:
-    #     get_parameter_map(fix_path = reference_path['FOV66'], 
-    #                       subject = subject_idx, 
-    #                       move_before_dir = mask_dir['FOV66']['before'], 
-    #                       move_after_dir = mask_dir['FOV66']['after'], 
-    #                       parameter_dir = map_dir['FOV66'], 
-    #                       is_mask=True)
-
-    #     use_parameter_map(subject = subject_idx, 
-    #                       move_before_dir = oct_dir['FOV66']['before'], 
-    #                       move_after_dir = oct_dir['FOV66']['after'], 
-    #                       parameter_dir = map_dir['FOV66'], 
-    #                       is_mask=True)
-
-    #     use_parameter_map(subject = subject_idx, 
-    #                       move_before_dir = octa_dir['FOV66']['before'], 
-    #                       move_after_dir = octa_dir['FOV66']['after'], 
-    #                       parameter_dir = map_dir['FOV66'], 
-    #                       is_mask=True)
-
-    for subject_idx in subject_list['FOV33']:
-        get_parameter_map(fix_path = reference_path['FOV33'], 
+    for subject_idx in subject_list['FOV66']:
+        get_parameter_map(fix_path = reference_path['FOV66'], 
                           subject = subject_idx, 
-                          move_before_dir = oct_dir['FOV33']['before'], 
-                          move_after_dir = oct_dir['FOV33']['after'], 
-                          parameter_dir = map_dir['FOV33'], 
+                          move_before_dir = mask_dir['FOV66']['before'], 
+                          move_after_dir = mask_dir['FOV66']['after'], 
+                          parameter_dir = map_dir['FOV66'], 
                           is_mask=True)
-        
+
         use_parameter_map(subject = subject_idx, 
-                          move_before_dir = octa_dir['FOV33']['before'], 
-                          move_after_dir = octa_dir['FOV33']['after'], 
-                          parameter_dir = map_dir['FOV33'], 
+                          move_before_dir = oct_dir['FOV66']['before'], 
+                          move_after_dir = oct_dir['FOV66']['after'], 
+                          parameter_dir = map_dir['FOV66'], 
                           is_mask=True)
+
+        use_parameter_map(subject = subject_idx, 
+                          move_before_dir = octa_dir['FOV66']['before'], 
+                          move_after_dir = octa_dir['FOV66']['after'], 
+                          parameter_dir = map_dir['FOV66'], 
+                          is_mask=True)
+
+    # for subject_idx in subject_list['FOV33']:
+    #     get_parameter_map(fix_path = reference_path['FOV33'], 
+    #                       subject = subject_idx, 
+    #                       move_before_dir = oct_dir['FOV33']['before'], 
+    #                       move_after_dir = oct_dir['FOV33']['after'], 
+    #                       parameter_dir = map_dir['FOV33'], 
+    #                       is_mask=True)
+        
+    #     use_parameter_map(subject = subject_idx, 
+    #                       move_before_dir = octa_dir['FOV33']['before'], 
+    #                       move_after_dir = octa_dir['FOV33']['after'], 
+    #                       parameter_dir = map_dir['FOV33'], 
+    #                       is_mask=True)
         
         # use_parameter_map(subject = subject_idx, 
         #                   move_before_dir = mask_dir['FOV66']['before'], 
