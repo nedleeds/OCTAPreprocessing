@@ -3,6 +3,18 @@ import numpy as np
 import nibabel as nib
 import SimpleITK as sitk
 
+def get_translation_map():
+    return sitk.GetDefaultParameterMap('translation')
+
+def get_rigid_map():
+    map_rigid = sitk.GetDefaultParameterMap('rigid')
+    map_rigid['NumberOfResolutions'] = ['3']
+    map_rigid['FixedImagePyramid'] = ['FixedSh']
+    map_rigid['NumberOfResolutions'] = ['3']
+    map_rigid['NumberOfResolutions'] = ['3']
+    map_rigid['NumberOfResolutions'] = ['3']
+
+
 def get_parameter_map(fix_path, subject, mov_before_dir, mov_after_dir, parameter_dir, isMask=False):
     mov_before_path = os.path.join(mov_before_dir, f'{subject}.nii.gz')
     mov_after_path = os.path.join(mov_after_dir, f'{subject}.nii.gz')
@@ -18,7 +30,8 @@ def get_parameter_map(fix_path, subject, mov_before_dir, mov_after_dir, paramete
 
     parmeter_vector = sitk.VectorOfParameterMap()
 
-    set_translation_map()
+    map_translation = get_translation_map()
+    map_rigid = get_rigid_map()
     
     
     
