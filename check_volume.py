@@ -12,13 +12,14 @@ def load_nifti(patient, nii_dir):
         return nib.load(nifti_path)
 
 def crop_nifti(data_dir, mask_dir, patient, center):
-    total_height = 224
+    total_height = 256
+    save_dir = f'/data/Nifti/In/Transformed/OCTA_SRL_{total_height}'
+    save_dir_mask = f'/data/Nifti/In/Transformed/Mask_SRL_{total_height}' 
 
     nii = load_nifti(patient, data_dir)
     nii_arr = np.asarray(nii.dataobj)
     nii_cropped = nii_arr[:, center-int(total_height/2):center+int(total_height/2), :]
-    nii_cropped_img = nib.Nifti1Image(nii_cropped, nii.affine, nii.header)
-    save_dir = f'/data/Nifti/In/FOV_66/OCTA_Affined_srl_n_{total_height}'
+    nii_cropped_img = nib.Nifti1Image(np.uint8(nii_cropped), nii.affine, nii.header)
     os.makedirs(save_dir, exist_ok=True)
     nib.save(nii_cropped_img, os.path.join(save_dir, f'{patient}.nii.gz'))
     print(f"{patient} has been cropped. size: {nii_cropped.shape}")
@@ -31,12 +32,9 @@ def crop_nifti(data_dir, mask_dir, patient, center):
     mask_srl_nii_arr[np.where((1<=mask_nii_cropped)&(mask_nii_cropped<=4))] = 1
     mask_srl_cropped_img = nib.Nifti1Image(mask_nii_cropped, mask_nii.affine, mask_nii.header)
 
-    save_dir_mask = f'/data/Nifti/In/FOV_66/Mask_SRL_{total_height}' 
     os.makedirs(save_dir_mask, exist_ok=True)
     nib.save(mask_srl_cropped_img, os.path.join(save_dir_mask, f'{patient}.nii.gz'))
     print(f"{patient} has been cropped. size: {mask_nii_cropped.shape}")
-    
-
 
 def check_height(patient_id, data_dir):
     # rename_file(select_dir)
@@ -71,8 +69,9 @@ def check_height(patient_id, data_dir):
         print(f'{patient} max height index : {maxH}')
         print(f'{patient} center index of z-axis : {center_z_idx}' )
         print(f'{patient} need {patients_dict[patient]["needed_height"][0]} height.')
-        # select_dir = '/data/Nifti/In/FOV_66/VolMask_Affined' # this is for cropping volMask
-        # crop_nifti(select_dir, mask_dir, patient, center_z_idx)
+        
+        mask_dir = '/data/Nifti/In/Transformed/VolMask'
+        crop_nifti(data_dir, mask_dir, patient, center_z_idx)
 
 def dict_to_CSV(save_dir, save_name):
     import pandas as pd
@@ -94,11 +93,19 @@ def dict_to_CSV(save_dir, save_name):
 
     df.to_csv(df_path, index=True, index_label='idx', mode='w')
 
+def file_name_change(patient, before_dir, after_dir):
+    fov = 'fov66' if patient < 10301 else 'fov33'
+    before_path = os.path.join(before_dir, f'{patient}_mask_{fov}_resized.nii.gz')
+    after_path = os.path.join(after_dir, f'{patient}.nii.gz')
+
+    os.system(f'mv {before_path} {after_path}')
+    print(f'{patient} has been re-named.')
+
 def main():
     global patients_dict, data_dir, skip_list, patients
     patients = []
     # data_dirs = get_dir_lab()
-    # skip_list =get_skip_list()
+    skip_list = [10035, 10057, 10114, 10219, 10220]
     select = [patient for patient in range(10001, 10501)]
     # broken = [10219, 10220]
     # patients_dict = {}
@@ -109,13 +116,15 @@ def main():
     os.makedirs(crop_dir, exist_ok=True)
     for patient in select:
         # if patient not in skip_list:
-        # if not os.path.isfile(f'/data/Nifti/In/FOV_66/OCTA_Affined_srl_cropped/{patient}.nii.gz'):
-            # print(patient)
+
+        # before_dir = '/data/Nifti/In/Transformed/VolMask'
+        # after_dir = before_dir
+        # file_name_change(patient, before_dir, after_dir)
 
         check_height( patient_id=patient, 
                       data_dir=data_dirs)
 
-    dict_to_CSV(save_dir=crop_dir, save_name='volume_info.csv')
+    # dict_to_CSV(save_dir=crop_dir, save_name='volume_info.csv')
     
                     
 
