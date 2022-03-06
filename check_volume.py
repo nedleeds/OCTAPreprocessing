@@ -24,7 +24,6 @@ def crop_nifti(data_dir, mask_dir, patient, center):
     nib.save(nii_cropped_img, os.path.join(save_dir, f'{patient}.nii.gz'))
     print(f"{patient} has been cropped. size: {nii_cropped.shape}")
 
-
     mask_nii = load_nifti(patient, mask_dir)
     mask_nii_arr = np.asarray(mask_nii.dataobj)
     mask_srl_nii_arr = np.zeros((192, total_height, 192))
