@@ -87,14 +87,17 @@ def make_bscan(load_nifti_path, save_bscan_path, slice_num):
 
 def main():
     # subjects = [ i for i in range(10001,10501) ]
-    subjects = [10132, 10334]
-    subjects.extend([i for i in range(10001, 10501, 50)])
+    arr = nib.load('/data/Nifti/In/Transformed/FOV_66/Mask_192/10001_mask_fov66_cropped.nii.gz')
+    print(np.shape(arr))
+
+    subjects = [10132]#, 10334]
+    subjects.extend([i for i in range(10001, 10301, 50)])
 
     before_registered_dir = {'mask':'/data/Nifti/In/Before_Transformed/VolMask',
                              'octa':'/data/Nifti/In/Before_Transformed/OCTA',
                              'oct' :'/data/Nifti/In/Before_Transformed/OCT'}
 
-    after_registered_dir = {'mask':'/data/Nifti/In/Transformed/VolMask2',
+    after_registered_dir = {'mask':'/data/Nifti/In/Transformed/VolMask',
                             'octa':'/data/Nifti/In/Transformed/OCTA',
                             'oct' :'/data/Nifti/In/Transformed/OCT'} # 10001_mask_translate_rigid.nii.gz
 
@@ -103,46 +106,69 @@ def main():
                  'oct' :'/data/Nifti/In/Transformed/Bscan/OCT'} # 10001_mask_translate_rigid.nii.gz
 
     for subject in subjects:
-        
+
+        slice_num = 200//2 if subject<10301 else 304//2
+        load_dir = '/data/Nifti/In/Transformed/FOV_66/Mask_192'
+        cropped_path = os.path.join(load_dir, f'{subject}_mask_fov66_cropped.nii.gz')
+        resized_path = os.path.join(load_dir, f'{subject}_mask_fov66_resized.nii.gz')
+
+
+        make_bscan(load_nifti_path = cropped_path,
+                   save_bscan_path = os.path.join(bscan_dir['mask'], f'{subject}_reg_crop.png'),
+                   slice_num = slice_num)
+
+        make_bscan(load_nifti_path = resized_path,
+                   save_bscan_path = os.path.join(bscan_dir['mask'], f'{subject}_reg_crop_resize.png'),
+                   slice_num = slice_num)
+
         '''
-        # These are for making bscan - for before & after registration
+        # These parts are for making bscan - for before & after registration
         slice_num = 400//2 if subject<10301 else 304//2
 
         make_bscan(load_nifti_path = os.path.join(before_registered_dir['mask'],f'{subject}.nii.gz'),
-                   save_bscan_path = os.path.join(bscan_dir['mask'],f'{subject}_before.png'),
+                   save_bscan_path = os.path.join(bscan_dir['mask'],f'{subject}_reg_before.png'),
                    slice_num = slice_num)
 
         make_bscan(load_nifti_path = os.path.join(after_registered_dir['mask'],f'{subject}_mask_translate_rigid.nii.gz'),
-                   save_bscan_path = os.path.join(bscan_dir['mask'],f'{subject}_after.png'),
+                   save_bscan_path = os.path.join(bscan_dir['mask'],f'{subject}_reg_after.png'),
                    slice_num = slice_num)
         '''
-        # if subject < 10301:
-        #     before_crop_dir = '/data/dataset/OCTA-500/OCTA_6M/Projection Maps/OCTA(ILM_OPL)'
-        #     after_crop_dir = '/data/dataset/OG/OCTA_Enface'
-        #     crop_area_dir = '/data/dataset/OG/OCTA_Enface_with_crop_area'
-        #     os.makedirs(crop_area_dir, exist_ok=True)
 
-        #     make_enface(load_nifti_path=f'/data/Nifti/In/FOV_66/OCTA_srl/{subject}.nii.gz',
-        #                 save_enface_path=f'/home/dhl/Project/OCTPreprocessing/enface/{subject}.png')
 
-        #     # image_crop(load_image_path = os.path.join(before_crop_dir, f'{subject}.bmp'),
-        #     #            save_image_path = os.path.join(after_crop_dir, f'{subject}.png'),
-        #     #            crop_area_path = os.path.join(crop_area_dir,f'{subject}.png'),
-        #     #            cropped_size = (200, 200),
-        #     #            is_display = False)
+        '''
+        #### These parts are for the Crop & Resizing 2D ground truth projected Image ####
+        if subject < 10301:
+            before_crop_dir = '/data/dataset/OCTA-500/OCTA_6M/Projection Maps/OCTA(ILM_OPL)'
+            after_crop_dir = '/data/dataset/OG/OCTA_Enface'
+            crop_area_dir = '/data/dataset/OG/OCTA_Enface_with_crop_area'
+            os.makedirs(crop_area_dir, exist_ok=True)
 
-        #     # image_resize(load_image_path = os.path.join(after_crop_dir, f'{subject}.png'), 
-        #     #              save_image_path = os.path.join(after_crop_dir, f'{subject}.png'),
-        #     #              resized_size = (192, 192), 
-        #     #              is_display = False)
+            #### Make En Face Image ####
+            make_enface(load_nifti_path=f'/data/Nifti/In/FOV_66/OCTA_srl/{subject}.nii.gz',
+                        save_enface_path=f'/home/dhl/Project/OCTPreprocessing/enface/{subject}.png')
 
-        # else:
-        #     before_resize_dir = '/data/dataset/OCTA-500/OCTA_3M/Projection Maps/OCTA(ILM_OPL)'
-        #     after_resize_dir = '/data/dataset/OCTA_Enface'
-        #     image_resize(load_image_path = os.path.join(before_resize_dir, f'{subject}.bmp'), 
-        #                  save_image_path = os.path.join(after_resize_dir, f'{subject}.png'),
-        #                  resized_size = (192, 192), 
-        #                  is_display = False)
+            #### Crop 2D Image ####
+            image_crop(load_image_path = os.path.join(before_crop_dir, f'{subject}.bmp'),
+                       save_image_path = os.path.join(after_crop_dir, f'{subject}.png'),
+                       crop_area_path = os.path.join(crop_area_dir,f'{subject}.png'),
+                       cropped_size = (200, 200),
+                       is_display = False)
+
+            #### Resize 2D Image ####
+            image_resize(load_image_path = os.path.join(after_crop_dir, f'{subject}.png'), 
+                         save_image_path = os.path.join(after_crop_dir, f'{subject}.png'),
+                         resized_size = (192, 192), 
+                         is_display = False)
+
+        else:
+            before_resize_dir = '/data/dataset/OCTA-500/OCTA_3M/Projection Maps/OCTA(ILM_OPL)'
+            after_resize_dir = '/data/dataset/OCTA_Enface'
+            image_resize(load_image_path = os.path.join(before_resize_dir, f'{subject}.bmp'), 
+                         save_image_path = os.path.join(after_resize_dir, f'{subject}.png'),
+                         resized_size = (192, 192), 
+                         is_display = False)
+
+        '''
 
         print(f'{subject} has been saved.')
 
