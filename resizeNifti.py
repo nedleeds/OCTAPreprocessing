@@ -48,9 +48,11 @@ class Resize():
             if 'FOV_66' in self.load_dir:
                 load_path = os.path.join(self.save_dir, f'{subject}_{self.retina}_{self.fov}_cropped.nii.gz')
             else:
-                # load_path = os.path.join(self.load_dir, f'{subject}_{self.retina}_translate_rigid.nii.gz')
-                load_path = os.path.join(self.load_dir, f'{subject}.nii.gz')
-            save_path = os.path.join(self.save_dir, f'{subject}_{self.retina}_{self.fov}_resized.nii.gz')
+                load_path = os.path.join(self.load_dir, f'{subject}_{self.retina}_translate_rigid.nii.gz')
+
+            load_path = os.path.join(self.load_dir, f'{subject}.nii.gz')
+            # save_path = os.path.join(self.save_dir, f'{subject}_{self.retina}_{self.fov}_resized.nii.gz')
+            save_path = os.path.join(self.save_dir, f'{subject}.nii.gz')
 
             nii_data, nii_info = next(self.load_nifti(load_path=load_path))
             assert before_size == nii_data.shape, 'before size should be same with loaded nifti size.' 
@@ -63,7 +65,7 @@ class Resize():
 
             for idx in range(h_o):
                 arr2img = Image.fromarray(np.uint8(before_nii[:,:,idx]))
-                resized_nii[:, :, idx] = arr2img.resize((w_r, d_r), Image.LANCZOS)
+                resized_nii[:, :, idx] = arr2img.resize((w_r, d_r), Image.NEAREST)
                 print(f'\rslice[{idx+1}] has been resized.', end='')
             
             resized_nii = np.transpose(resized_nii, (0, 2, 1))
@@ -76,13 +78,16 @@ class Resize():
                             before_info = nii_info, 
                             after_info = self.get_FOV33_info(nii_size=after_size),
                             save_path = save_path)
+            # if subject == 10002:
+            #     break
 
     def cropping(self, before_size, after_size):
         for subject in self.subeject_list:
-            load_path = os.path.join(self.load_dir, f'{subject}_{self.retina}_srl_translate_rigid.nii.gz')
+            # load_path = os.path.join(self.load_dir, f'{subject}_{self.retina}_translate_rigid.nii.gz')
             # load_path = os.path.join(self.load_dir, f'{subject}_mask_srl.nii.gz')
-            
-            save_path = os.path.join(self.save_dir, f'{subject}_{self.retina}_{self.fov}_cropped.nii.gz')
+            load_path = os.path.join(self.load_dir, f'{subject}.nii.gz')
+            # save_path = os.path.join(self.save_dir, f'{subject}_{self.retina}_{self.fov}_cropped.nii.gz')
+            save_path = os.path.join(self.save_dir, f'{subject}.nii.gz')
 
             nii_data, nii_info = next(self.load_nifti(load_path=load_path))
             assert before_size == nii_data.shape, 'before size should be same with loaded nifti size.'
@@ -108,7 +113,8 @@ class Resize():
                             before_info = nii_info, 
                             after_info = self.get_FOV33_info(nii_size=after_size),
                             save_path = save_path)
-            
+            # if subject == 10002:
+            #     break
 
     def get_FOV33_info(self, nii_size):
         scale = 19*3
@@ -157,24 +163,31 @@ class Resize():
         print(f'nifti saved at {save_path}')
 
 def main():
-    load_dir = {'FOV66' : ['/data/Nifti/In/Transformed/FOV_66/OCT', 
-                           '/data/Nifti/In/Transformed/FOV_66/OCTA_SRL', 
-                           '/data/Nifti/In/Transformed/FOV_66/VolMask_SRL/'],
-                'FOV33' : ['/data/Nifti/In/Transformed/FOV_33/OCT', 
-                           '/data/Nifti/In/Transformed/FOV_33/OCTA_SRL', 
-                           '/data/Nifti/In/Transformed/FOV_33/VolMask']}
 
-    resized_dir = {'FOV66' : ['/data/Nifti/In/Transformed/FOV_66/OCT_192', 
-                              '/data/Nifti/In/Transformed/FOV_66/OCTA_SRL', 
-                              '/data/Nifti/In/Transformed/FOV_66/Mask_192'],
-                   'FOV33' : ['/data/Nifti/In/Transformed/FOV_33/OCT_192', 
-                              '/data/Nifti/In/Transformed/FOV_33/OCTA_SRL', 
-                              '/data/Nifti/In/Transformed/FOV_33/Mask_192']}
+    # load_dir = {'FOV66' : ['/data/Nifti/In/Transformed/FOV_66/OCT', 
+    #                        '/data/Nifti/In/Transformed/FOV_66/OCTA', 
+    #                        '/data/Nifti/In/Transformed/FOV_66/VolMask/'],
+    #             'FOV33' : ['/data/Nifti/In/Transformed/FOV_33/OCT', 
+    #                        '/data/Nifti/In/Transformed/FOV_33/OCTA', 
+    #                        '/data/Nifti/In/Transformed/FOV_33/VolMask']}
+
+    # resized_dir = {'FOV66' : ['/data/Nifti/In/Transformed/FOV_66/OCT_192', 
+    #                           '/data/Nifti/In/Transformed/FOV_66/OCTA_192', 
+    #                           '/data/Nifti/In/Transformed/FOV_66/Mask_256'],
+    #                'FOV33' : ['/data/Nifti/In/Transformed/FOV_33/OCT_192', 
+    #                           '/data/Nifti/In/Transformed/FOV_33/OCTA_192', 
+    #                           '/data/Nifti/In/Transformed/FOV_33/Mask_256']}
+
+    load_dir = {'FOV66' : ['/data/Nifti/In/FOV_66/OCTA_srl'],
+                'FOV33' : ['/data/Nifti/In/FOV_33/OCTA_SRL']}
+
+    resized_dir = {'FOV66' : ['/data/Nifti/In/Transformed/OCTA_SRL_NO_REG_BUT_RESIZED_BEFORE_ZCROP'],
+                  'FOV33' : ['/data/Nifti/In/Transformed/OCTA_SRL_NO_REG_BUT_RESIZED_BEFORE_ZCROP']}
 
     subject_list = {'FOV66' : [subject for subject in range(10001, 10301)],
                     'FOV33' : [subject for subject in range(10301, 10501)]}
-    # subject_list = {'FOV66' : [10001],
-    #                 'FOV33' : [10302, 10303]}
+    # subject_list = {'FOV66' : [10151],
+    #                 'FOV33' : [10401, 10451]}
 
     croped_size = (200, 640, 200)
     resized_size = (192, 640, 192)
@@ -183,23 +196,25 @@ def main():
 
     resizer = Resize()
 
-    # # This is for the change header.
-    # for subject in subject_list['FOV33']:
-    #     load_path = f'/data/Nifti/In/Transformed/FOV_33/VolMask/{subject}_mask_translate_rigid.nii.gz'
-    #     save_path = f'/data/Nifti/In/Transformed/FOV_33/VolMask/{subject}_mask_translate_rigid.nii.gz'
-    #     resizer.change_header(load_path, save_path, original_size['FOV33'])
+    # # # This is for the change header.
+    # # for subject in subject_list['FOV33']:
+    # for subject in range(10001,10501):
+    #     load_path = f'/data/Nifti/In/Transformed/Mask_SRL_256/{subject}.nii.gz'
+    #     save_path = f'/data/Nifti/In/Transformed/Mask_SRL_256/{subject}.nii.gz'
+    #     nii_size = np.asarray(nib.load(load_path).dataobj).shape
+    #     resizer.change_header(load_path, save_path, nii_size)
+        # resizer.change_header(load_path, save_path, original_size['FOV33'])
 
-
-    for fov in ['FOV66']:
+    for fov in ['FOV66', 'FOV33']:
         for nii_dir, resize_dir in zip(load_dir[fov], resized_dir[fov]):           
-            if 'OCTA' in nii_dir:
-                resizer.set_dir(load_dir=nii_dir, save_dir=resize_dir)
-                resizer.set_subject_list(subject_list[fov])
-                resizer.set_retina_type(load_dir=nii_dir)
-                if fov == 'FOV66':
-                    resizer.cropping(before_size = original_size[fov], after_size = croped_size)
-                    resizer.resizing(before_size = croped_size, after_size = resized_size)    
-                else:
-                    resizer.resizing(before_size = original_size[fov], after_size = resized_size)
+            resizer.set_dir(load_dir=nii_dir, save_dir=resize_dir)
+            resizer.set_subject_list(subject_list[fov])
+            resizer.set_retina_type(load_dir=nii_dir)
+            if fov == 'FOV66':
+                # resizer.cropping(before_size = original_size[fov], after_size = croped_size)
+                resizer.set_dir(load_dir=resize_dir, save_dir=resize_dir)
+                resizer.resizing(before_size = croped_size, after_size = resized_size)    
+            else:
+                resizer.resizing(before_size = original_size[fov], after_size = resized_size)
 
 main()
