@@ -1,4 +1,4 @@
-# OCTPreprocessin
+# OCTPreprocessing
 
 ### Bmp2Nifti
 
