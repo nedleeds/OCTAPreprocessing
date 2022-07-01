@@ -1,10 +1,13 @@
-<<<<<<< HEAD
-# OCTAPreprocessing
-=======
-# OCTPreprocessing
->>>>>>> e076f37a22b2f78d5d2a1ff20bbfbe43ff7c1acd
 
-### Bmp2Nifti
+# OCTAPreprocessing
+
+> Basically, here are 2 main process for the OCT(A) volume data.
+> First one is making volume data(.nii.gz) from the provided image(.bmp).
+> Second one is transforming and resizing the Nifti data(linear registraion, crop&resize and resize nifti).
+
+### 1. Make a Nifti volume by stacking bmp Images
+
+####   bmp2nii.py
 
 - Convert Bmp files to Nifti files.Set 3 types of options.
 
@@ -19,4 +22,8 @@
      - physical resolution = FOV size * scale
      - orgin, spacing will be setted by this FOV and scale factor.
 
-### NiftiResize
+### 2. Transform the Nifti Volume
+
+#### 2-1) registration.py
+
+#### 2-2) crop_resize.py
