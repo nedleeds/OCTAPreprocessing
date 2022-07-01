@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # OCTAPreprocessing
+=======
+# OCTPreprocessing
+>>>>>>> e076f37a22b2f78d5d2a1ff20bbfbe43ff7c1acd
 
 ### Bmp2Nifti
 
