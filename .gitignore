@@ -1,5 +1,5 @@
 /data/*
 /Slicer-4.11.20210226-linux-amd64/
+*.txt
 *.nii.gz
 *.nii
-*.txt

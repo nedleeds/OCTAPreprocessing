@@ -71,7 +71,7 @@ def check_height(patient_id, data_dir):
     patients.append(patient)
     srl = load_nifti(patient_id, nii_dir=data_dir)
     srl_nii = np.asarray(srl.dataobj)
-    if np.max(srl_nii)==0:
+    if np.max(srl_nii)==0:  
         pass
     else:
         for x in range(srl_nii.shape[0]):
