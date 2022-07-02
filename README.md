@@ -30,6 +30,11 @@
 
 ### 2. Transform the Nifti Volume
 
-#### 2-1) registration.py
+> Transformation consists of several setps and overall process is shown in below Figure.
 
-#### 2-2) crop_resize.py
+![preprocessing_3d](https://user-images.githubusercontent.com/48194000/176991330-8f9d3f5a-e639-4acc-b6e6-f078e7cb6e54.png)
+
+* registration.py
+
+
+* crop_resize.py
