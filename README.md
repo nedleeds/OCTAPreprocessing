@@ -13,7 +13,7 @@
 
 #### bmp2nii.py
 
-- Convert Bmp files to Nifti files.Set 3 types of options.
+- Convert Bmp files to Nifti files and set the 3 types of options.
 
   1. bmp_dir - load directory
 
@@ -25,6 +25,8 @@
 
      - physical resolution = FOV size * scale
      - orgin, spacing will be setted by this FOV and scale factor.
+     - This figure needs to set the header information of the Nifti.
+     - source : [IEEE-OCTA500](https://ieee-dataport.org/open-access/octa-500)
 
 ### 2. Transform the Nifti Volume
 
