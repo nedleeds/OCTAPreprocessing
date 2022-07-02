@@ -211,7 +211,7 @@ def main():
             resizer.set_subject_list(subject_list[fov])
             resizer.set_retina_type(load_dir=nii_dir)
             if fov == 'FOV66':
-                # resizer.cropping(before_size = original_size[fov], after_size = croped_size)
+                resizer.cropping(before_size = original_size[fov], after_size = croped_size)
                 resizer.set_dir(load_dir=resize_dir, save_dir=resize_dir)
                 resizer.resizing(before_size = croped_size, after_size = resized_size)    
             else:
