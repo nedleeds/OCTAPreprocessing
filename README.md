@@ -23,7 +23,7 @@
   2. nii_dir - save directory
   3. FOV (Field Of View for scanning)
 
-     - physical resolution = FOV size * scale
+     - physical resolution = [FOV size * scale](https://github.com/nedleeds/OCTAPreprocessing/blob/main/bmp2nii.py#L83)
      - orgin, spacing will be setted by this FOV and scale factor.
      - This figure needs to set the header information of the Nifti.
      - source : [IEEE-OCTA500](https://ieee-dataport.org/open-access/octa-500)
