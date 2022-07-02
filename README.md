@@ -25,7 +25,7 @@
 
      - physical resolution = [FOV size * scale](https://github.com/nedleeds/OCTAPreprocessing/blob/main/bmp2nii.py#L82)
      - orgin, spacing will be setted by this FOV and scale factor.
-     - This figure needs to set the header information of the Nifti.
+     - This figure needs to [set the header information of the Nifti](https://github.com/nedleeds/OCTAPreprocessing/blob/main/bmp2nii.py#L56).
      - source : [IEEE-OCTA500](https://ieee-dataport.org/open-access/octa-500)
 
 ### 2. Transform the Nifti Volume
