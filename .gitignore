@@ -3,3 +3,4 @@
 *.txt
 *.nii.gz
 *.nii
+check_normalization.py
