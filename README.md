@@ -1,13 +1,17 @@
-
 # OCTAPreprocessing
 
-> Basically, here are 2 main process for the OCT(A) volume data.
-> First one is making volume data(.nii.gz) from the provided image(.bmp).
-> Second one is transforming and resizing the Nifti data(linear registraion, crop&resize and resize nifti).
+> Basically, here are 2 main process for the OCT(A) volume data
+> First, reconstruct 3D raw volume data by stacking .bmp images
+> Second, transform and resize the reconstructed raw data(linear registraion, crop&resize and resize nifti).
+> The reason of these process is really clear. In the process of scanning, it is dificult to
+> prevent all the movement from the patients. Especially the OCT data is a retina image,
+> it is almost nonsense that we can control our pupil movement.
+> And the data consists of left and right eyes, partially, it has structural differences.
+> To deal with these points, we propose below data pre-processing steps.
 
 ### 1. Make a Nifti volume by stacking bmp Images
 
-####   bmp2nii.py
+#### bmp2nii.py
 
 - Convert Bmp files to Nifti files.Set 3 types of options.
 
