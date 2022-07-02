@@ -11,7 +11,7 @@
 
 ### 1. Make a Nifti volume by stacking bmp Images
 
-####   [bmp2nii.py](https://github.com/nedleeds/OCTAPreprocessing/blob/main/bmp2nii.py#L9)
+* ### [bmp2nii.py](https://github.com/nedleeds/OCTAPreprocessing/blob/main/bmp2nii.py#L9)
 
 - Convert Bmp files to Nifti files and set the 3 types of options.
 
