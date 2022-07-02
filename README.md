@@ -45,7 +45,7 @@
       pip install SimpleITK
       pip install SimpleITK-SimpleElastix
       ```
-* crop_resize.py
+* [resize_nifti.py]()
   * The given data had been collected with different FOV, it has different resolution. To utilize the total data(500), it is needed to implement Volume resizing.
-  * [For FOV66(subject - 10001 ~ 10300), center-cropping has been used to match the FOV33 but as its size still 200x200x640, considering the pooling step for train-phase, we resize it to 192x192x640.](https://github.com/nedleeds/OCTAPreprocessing/blob/main/crop_resize.py#L254)
+  * [For FOV66(subject - 10001 ~ 10300), center-cropping has been used to match the FOV33 but as its size still 200x200x640, considering the pooling step for train-phase, we resize it to 192x192x640.](https://github.com/nedleeds/OCTAPreprocessing/blob/main/crop_resize.py#)
   * [For FOV33(subject - 10301 ~ 10500), only the resizing had been adapted.](https://github.com/nedleeds/OCTAPreprocessing/blob/main/crop_resize.py#L277)
