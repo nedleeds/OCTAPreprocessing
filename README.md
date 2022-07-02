@@ -35,8 +35,10 @@
 ![preprocessing_3d](https://user-images.githubusercontent.com/48194000/176991330-8f9d3f5a-e639-4acc-b6e6-f078e7cb6e54.png)
 
 * Retina Layer segmentation
+
   * This part had been implemented by [OCTExplorer3.8.0](https://www.iibi.uiowa.edu/ophthalmic-analysis)
 * [registration.py](https://github.com/nedleeds/OCTAPreprocessing/blob/main/registration.py#L212)
+
   * In this experiment, to retain the volumetric data and try not to give a damage to the original data,
     only [linear registration (translation, affine transformaion) had been leveraged](https://github.com/nedleeds/OCTAPreprocessing/blob/main/registration.py#L125).
   * However, we implemented the non-linear transformation either, you can use it if you want.
@@ -46,6 +48,21 @@
       pip install SimpleITK-SimpleElastix
       ```
 * [resize_nifti.py]()
+
   * The given data had been collected with different FOV, it has different resolution. To utilize the total data(500), it is needed to implement Volume resizing.
   * [For FOV66(subject - 10001 ~ 10300), center-cropping has been used to match the FOV33 but as its size still 200x200x640, considering the pooling step for train-phase, we resize it to 192x192x640.](https://github.com/nedleeds/OCTAPreprocessing/blob/main/resize_nifti.py#L213)
   * [For FOV33(subject - 10301 ~ 10500), only the resizing had been adapted.](https://github.com/nedleeds/OCTAPreprocessing/blob/main/resize_nifti.py#L217)
+  * [crop_resize.py](https://github.com/nedleeds/OCTAPreprocessing/blob/main/crop_resize.py) is for the 2D. As 2D Enface has also different FOV, resizing is also needed either.
+
+
+* [check_volume.py](https://github.com/nedleeds/OCTAPreprocessing/blob/main/check_volume.py#L68)
+  * This script is for checking the height of all the volumes by considering non-zero value for the z-axis.
+    * Procedure
+
+      > 1. Check one-by-one and save the each first and last non-zero values.
+      > 2. Before finish checking, save these z-indices for the .csv file.
+      > 3. Choose the proper height based on the .csv file.
+      > 4. Re-implement this module with the selected height.
+      > 5. Then volume will be cropped from the middle point of the non-zero z indices
+      >    with the selected height automatically.
+      >
